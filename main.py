@@ -14,7 +14,6 @@ clock = pygame.time.Clock()
 # Initializing interface
 Interface = pygame_ui.init() # Addition
 
-
 while True:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
