@@ -1,8 +1,6 @@
 
 # Pygame UI README
 
-[![Awesome](https://cdn.jsdelivr.net/gh/sindresorhus/awesome@d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/RednaxGaming/PygameUIMaker)
-
 [Pygame UI](https://github.com/RednaxGaming/PygameUIMaker) is a module for building user interfaces in [pygame](https://www.pygame.org/).
 
 It is currently a work in progress, but if you wanna test it out, feel free to do so :)
