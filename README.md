@@ -45,6 +45,7 @@ You will have two files in the same folder:
 Here a simple example for making a label:
 
 #### Python File
+
 Notice that the `event_handler` is actually not required unless you want interactive elements to function as expected.
 
 ```python
