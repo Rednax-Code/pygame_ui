@@ -1,0 +1,12 @@
+{
+	"label": {
+		"name": "test_label",
+		"position": [200,100],
+		"size": [120,80],
+		"auto_size": true,
+		"text": "IT WORKS!",
+		"font_size": 20,
+		"is_visible": true,
+		"background_color": [255,0,0]
+	}
+}
