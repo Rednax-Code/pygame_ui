@@ -2,7 +2,7 @@
 blabla
 """
 
-from PygameUI.constants import *
+from pygame_ui.constants import *
 import pygame.font as pygfont
 import pygame.rect as pygrect
 import pygame.draw as pygdraw

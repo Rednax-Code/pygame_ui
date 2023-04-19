@@ -1,6 +1,5 @@
 import pygame
-import PygameUI # Addition
-
+import pygame_ui # Addition
 
 pygame.init()
 
@@ -11,8 +10,9 @@ screen = pygame.display.set_mode((width, height), flags, vsync=1)
 pygame.display.set_caption("UI Test")
 clock = pygame.time.Clock()
 
+
 # Initializing interface
-Interface = PygameUI.init() # Addition
+Interface = pygame_ui.init() # Addition
 
 
 while True:

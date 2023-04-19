@@ -1,13 +1,9 @@
-"""
-blabla
-"""
-
-import PygameUI.elements
+import pygame_ui.elements
 
 
 class Graphical_UI:
 	"""
-	blabla
+	The main GUI handler
 	"""
 
 	Elements = {}
@@ -15,9 +11,9 @@ class Graphical_UI:
 	def __init__(self, objects:dict):
 		for item_type, data in objects.items():
 			element_id = data.pop('name')
-			self.Elements[element_id] = getattr(PygameUI.elements, item_type)(data)
+			self.Elements[element_id] = getattr(pygame_ui.elements, item_type)(data)
 
-	def add_element(self, name:str, Element:PygameUI.elements.UI_Element):
+	def add_element(self, name:str, Element:pygame_ui.elements.UI_Element):
 		self.Elements[name] = Element
 
 	def remove_element(self, name:str):
@@ -29,7 +25,11 @@ class Graphical_UI:
 
 	def event_handler(self, event):
 		"""
-		blabla
+		This handles all interactive elements.
+
+		Must be called in the following context:
+		>>> for event in pygame.event.get():
+			Interface.event_handler(event)
 		"""
 
 		return 1
@@ -64,6 +64,6 @@ def init():
 	interface = Graphical_UI(UI)
 
 	# clearing up namespace
-	del json, os, PygameUI.elements
+	del json, os, pygame_ui.elements
 
 	return interface
