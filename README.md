@@ -8,17 +8,17 @@ It is currently a work in progress, but if you wanna test it out, feel free to d
 ## Table Of Content
 
 - [Quick Start](#quick-start)
-	- [Installation](#installation)
-	- [Setup](#setup)
-		- [Python](#python-file)
-		- [JSON](#json-file)
+   - [Installation](#installation)
+   - [Setup](#setup)
+      - [Python](#python-file)
+      - [JSON](#json-file)
 - [Element List](#element-list)
 - [Attribute List](#attribute-list)
-	- [General](#general)
-	- [Frame](#frame)
-	- [Label](#label)
+   - [General](#general)
+   - [Frame](#frame)
+   - [Label](#label)
 - [Frames](#frames)
-	- [Frame Path](#frame-path)
+   - [Frame Path](#frame-path)
 - [Examples](#examples)
 - [FAQ](#faq)
 
@@ -45,6 +45,7 @@ You will have two files in the same folder:
 Here a simple example for making a label:
 
 #### Python File
+
 Notice that the `event_handler` is actually not required unless you want interactive elements to function as expected.
 
 ```python
@@ -63,19 +64,19 @@ Interface = pygame_ui.init()
 
 
 while True:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			quit()
-		# Call event handler
-		Interface.event_handler(event)
+   for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+         quit()
+      # Call event handler
+      Interface.event_handler(event)
 
-	screen.fill((0,0,0))
+   screen.fill((0,0,0))
 
-	# Draw interface
-	Interface.draw(screen)
+   # Draw interface
+   Interface.draw(screen)
 
-	pygame.display.flip()
-	clock.tick(60)
+   pygame.display.flip()
+   clock.tick(60)
 ```
 
 #### JSON File
@@ -83,15 +84,15 @@ MUST be named `Interface.json` and in the same folder as python file!
 
 ```json
 {
-	"label": {
-		"name": "test_label",
-		"position": [200,100],
-		"size": [120,80],
-		"background_color": [200,0,0],
-		"text": "IT WORKS!",
-		"font_size": 20,
-		"auto_size": true
-	}
+   "label": {
+      "name": "test_label",
+      "position": [200,100],
+      "size": [120,80],
+      "background_color": [200,0,0],
+      "text": "IT WORKS!",
+      "font_size": 20,
+      "auto_size": true
+   }
 }
 ```
 
@@ -143,22 +144,22 @@ A frame path is a string representation of the route to a certain frame.
 Say we have the following json file
 ```json
 {
-	"frame": {
-		"name": "Arthur"
-		"contents": {
-			"frame": {
-				"name": "Bertha"
-				"contents": {
-					"frame": {
-						"name": "Pippinpaddleopsicopolis"
-					}
-				}
-			},
-			"frame": {
-				"name": "Cedric"
-			}
-		}
-	}
+   "frame": {
+      "name": "Arthur"
+      "contents": {
+         "frame": {
+            "name": "Bertha"
+            "contents": {
+               "frame": {
+                  "name": "Pippinpaddleopsicopolis"
+               }
+            }
+         },
+         "frame": {
+            "name": "Cedric"
+         }
+      }
+   }
 }
 ```
 
@@ -215,30 +216,30 @@ Interface = pygame_ui.init()
 
 path = 'frame0'
 for i in range(100):
-	frame = 'frame'+str(i+1)
-	Interface.add_element(frame, pygame_ui.frame(), path)
-	path += '->'+frame
+   frame = 'frame'+str(i+1)
+   Interface.add_element(frame, pygame_ui.frame(), path)
+   path += '->'+frame
 
 while True:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			quit()
+   for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+         quit()
 
-	screen.fill((0,0,0))
+   screen.fill((0,0,0))
 
-	Interface.draw(screen)
+   Interface.draw(screen)
 
-	pygame.display.flip()
-	clock.tick(60)
+   pygame.display.flip()
+   clock.tick(60)
 ```
 
 #### JSON
 ```json
 {
-	"frame": {
-		"name": "frame0",
-		"contents": {}
-	}
+   "frame": {
+      "name": "frame0",
+      "contents": {}
+   }
 }
 ```
 
