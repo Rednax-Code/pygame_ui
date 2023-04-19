@@ -1,12 +1,27 @@
 {
-	"label": {
-		"name": "test_label",
-		"position": [200,100],
-		"size": [120,80],
-		"auto_size": true,
-		"text": "IT WORKS!",
-		"font_size": 20,
-		"is_visible": true,
-		"background_color": [255,0,0]
+	"frame": {
+		"name": "test_frame",
+		"position": [100,50],
+		"size": [500,500],
+		"background_color": [0,0,100],
+		"contents": {
+			"frame": {
+				"name": "test_frame_in_frame",
+				"position": [120,80],
+				"size": [300,200],
+				"background_color": [0,0,150],
+				"contents": {
+					"label": {
+						"name": "test_label",
+						"position": [200,100],
+						"size": [120,80],
+						"background_color": [255,0,0],
+						"text": "IT WORKS!",
+						"font_size": 20,
+						"auto_size": true
+					}
+				}
+			}
+		}
 	}
 }

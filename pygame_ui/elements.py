@@ -14,7 +14,7 @@ class UI_Element:
 	position = [0,0]
 	size = [0,0]
 	background_color = None
-	is_visible = False
+	is_visible = True
 	is_hoverable = False
 	is_clickable = False
 	auto_size = False
@@ -29,10 +29,16 @@ class UI_Element:
 		self.rectangle = pygrect.Rect(self.position, self.size)
 	
 	def change_position(self, new_position):
+		"""
+		You can figure this one out yourself. If you can't then... *sigh*
+		"""
 		self.position = new_position
 		self.rectangle = pygrect.Rect(self.position, self.size)
 
 	def change_size(self, new_size):
+		"""
+		You can figure this one out yourself. If you can't then... *sigh*
+		"""
 		self.size = new_size
 		self.rectangle = pygrect.Rect(self.position, self.size)
 	
@@ -46,16 +52,36 @@ class UI_Element:
 
 
 class frame(UI_Element):
+	"""
+	The UI element that works as a sort of bundle or group.
 
+	Yes, frame-ception is a thing.
+	"""
+	
+	contents = {}
 
 	def __init__(self, *initial_data, **kwargs):
+		self.elements = {}
 		super().__init__(initial_data, kwargs)
+		for item_type, data in self.contents.items():
+			element_id = data.pop('name')
+			self.elements[element_id] = globals()[item_type](data)
 	
 	def draw(self, pygame_window):
-		pass
+		for i in self.elements.values():
+			if i.is_visible:
+				if i.background_color != None:
+					i.draw_bg(pygame_window)
+				i.draw(pygame_window)
 
 
 class label(UI_Element):
+	"""
+	The UI element for text.
+
+	Anything with letters will use this class.
+	"""
+	
 	text = "Empty Label"
 	text_color = (255,255,255)
 	text_aa = True
@@ -69,6 +95,13 @@ class label(UI_Element):
 		self.font = pygfont.SysFont(self.font_name, self.font_size, self.font_bold, self.font_italic)
 	
 	def change_font(self, **kwargs):
+		"""
+		Used to change attributes of the font.
+
+		The keyword arguments must exist in the following list:
+		>>> ['font_name', 'font_size', 'font_bold', 'font_bold']
+		"""
+
 		for key in kwargs:
 			if key in FONT_ATTRIBUTES:
 				setattr(self, key, kwargs[key])
