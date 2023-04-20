@@ -26,7 +26,6 @@ class UI_Element:
 	size = [0,0]
 	auto_size = False
 	background_color = None
-	state = None
 
 	def __init__(self, initial_data, kwargs):
 		for dictionary in initial_data:
