@@ -1,5 +1,7 @@
 from pygame_ui.constants import *
 import pygame_ui.elements
+import pygame.locals as pyglocal
+import pygame.mouse as pygmouse
 
 
 class Graphical_UI:
@@ -12,11 +14,11 @@ class Graphical_UI:
 	"""
 
 	elements = {}
+	interactive_elements = []
 
 	def __init__(self, objects:dict):
 		for item_type, data in objects.items():
-			element_id = data.pop('name')
-			self.elements[element_id] = getattr(pygame_ui.elements, item_type)(data)
+			self.elements[data['name']] = getattr(pygame_ui.elements, item_type)(data)
 
 	def get_frame(self, frame_path:str=''):
 		"""
@@ -61,6 +63,16 @@ class Graphical_UI:
 		else:
 			raise KeyError('No element with name \''+frame_path+'\' was found. '+MORE_INFO+'frame paths')
 
+	def get_interactive_elements(self):
+		interactives = []
+		for name, element in self.elements.items():
+			if element.is_visible:
+				if isinstance(element, pygame_ui.frame):
+					interactives.extend(element.get_interactive_elements())
+				elif element.is_hoverable or element.is_clickable:
+					interactives.append(element)
+		self.interactive_elements = interactives
+
 	def event_handler(self, event):
 		"""
 		This handles all interactive elements.
@@ -69,6 +81,28 @@ class Graphical_UI:
 		>>> for event in pygame.event.get():
 			Interface.event_handler(event)
 		"""
+		self.get_interactive_elements()
+
+		element = None
+		
+		for i in self.interactive_elements:
+			if i.is_clickable or i.is_hoverable:
+				mouse_in_boundry = i.rectangle.collidepoint(pygmouse.get_pos())
+			
+			if mouse_in_boundry:
+				if event.type in [pyglocal.MOUSEBUTTONDOWN, pyglocal.MOUSEBUTTONUP] and i.is_clickable:
+					element = i
+				elif event.type in [pyglocal.MOUSEMOTION, pyglocal.MOUSEWHEEL] and i.is_hoverable:
+					element = i
+
+		if element != None:
+			if event.type == pyglocal.MOUSEBUTTONDOWN and pygmouse.get_pressed(3)[0] == 1:
+				element.click_start = True
+				element.held = True
+		
+			elif event.type == pyglocal.MOUSEBUTTONUP and pygmouse.get_pressed(3)[0] == 0:
+				element.click_end = True
+				element.held = False
 
 		return 1
 	
@@ -87,6 +121,14 @@ class Graphical_UI:
 					i.draw_bg(pygame_window)
 				i.draw(pygame_window)
 		
+		for i in self.interactive_elements:
+			if i.is_clickable:
+				i.click_start = False
+				i.click_end = False
+			if i.is_hoverable:
+				i.hover_start = False
+				i.hover_end = False
+				
 		return 1
 
 

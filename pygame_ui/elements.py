@@ -2,22 +2,30 @@
 blabla
 """
 
-from pygame_ui.constants import *
+from importlib import import_module
+import os
+import sys
+
 import pygame.font as pygfont
 import pygame.rect as pygrect
 import pygame.draw as pygdraw
+
+from pygame_ui.constants import *
+
+
+sys.path.append(os.getcwd())
 
 pygfont.init()
 
 
 class UI_Element:
-	position = [0,0]
-	size = [0,0]
-	background_color = None
 	is_visible = True
 	is_hoverable = False
 	is_clickable = False
+	position = [0,0]
+	size = [0,0]
 	auto_size = False
+	background_color = None
 
 	def __init__(self, initial_data, kwargs):
 		for dictionary in initial_data:
@@ -64,8 +72,17 @@ class frame(UI_Element):
 		self.elements = {}
 		super().__init__(initial_data, kwargs)
 		for item_type, data in self.contents.items():
-			element_id = data.pop('name')
-			self.elements[element_id] = globals()[item_type](data)
+			self.elements[data['name']] = globals()[item_type](data)
+	
+	def get_interactive_elements(self):
+		interactives = []
+		for name, element in self.elements.items():
+			if element.is_visible:
+				if isinstance(element, frame) and not isinstance(element, button):
+					interactives.extend(element.get_interactive_elements())
+				elif element.is_hoverable or element.is_clickable:
+					interactives.append(element)
+		return interactives
 	
 	def draw(self, pygame_window):
 		for i in self.elements.values():
@@ -73,6 +90,17 @@ class frame(UI_Element):
 				if i.background_color != None:
 					i.draw_bg(pygame_window)
 				i.draw(pygame_window)
+
+
+class button(frame):
+	is_clickable = True
+	is_hoverable = True
+	click_start = False
+	click_end = False
+	held = False
+	hover_start = False
+	hover_end = False
+	hovered = False
 
 
 class label(UI_Element):
@@ -112,16 +140,6 @@ class label(UI_Element):
 	def draw(self, pygame_window):
 		text_render = self.font.render(self.text, self.text_aa, self.text_color, self.background_color)
 		pygame_window.blit(text_render, self.position)
-
-
-class button(UI_Element):
-	is_clickable = True
-
-	def __init__(self, *initial_data, **kwargs):
-		super().__init__(initial_data, kwargs)
-
-	def draw(self, pygame_window):
-		pass
 
 
 class switch(UI_Element):

@@ -1,24 +1,29 @@
 {
 	"frame": {
-		"name": "test_frame",
+		"name": "frame1",
 		"position": [100,50],
 		"size": [500,500],
 		"background_color": [0,0,100],
 		"contents": {
 			"frame": {
-				"name": "test_frame_in_frame",
-				"position": [120,80],
-				"size": [300,200],
-				"background_color": [0,0,150],
+				"name": "frame2",
+				"position": [200,100],
+				"size": [300,300],
+				"background_color": [0,50,100],
 				"contents": {
-					"label": {
-						"name": "test_label",
-						"position": [200,100],
-						"size": [120,80],
-						"background_color": [255,0,0],
-						"text": "IT WORKS!",
-						"font_size": 20,
-						"auto_size": true
+					"button": {
+						"name": "harry the button",
+						"position": [250,120],
+						"size": [200,200],
+						"background_color": [100,0,0],
+						"contents": {
+							"label": {
+								"name": "richard",
+								"position": [260,150],
+								"font_size": 30,
+								"auto_size": true
+							}
+						}
 					}
 				}
 			}

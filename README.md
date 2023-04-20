@@ -1,7 +1,7 @@
 
 # Pygame UI README
 
-[Pygame UI](https://github.com/RednaxGaming/PygameUIMaker) is a module for building user interfaces in [pygame](https://www.pygame.org/).
+[Pygame UI](https://github.com/RednaxGaming/pygame_ui) is a module for building user interfaces in [pygame](https://www.pygame.org/).
 
 It is currently a work in progress, but if you wanna test it out, feel free to do so :)
 
@@ -17,6 +17,7 @@ It is currently a work in progress, but if you wanna test it out, feel free to d
    - [General](#general)
    - [Frame](#frame)
    - [Label](#label)
+   - [Button](#button)
 - [Frames](#frames)
    - [Frame Path](#frame-path)
 - [Examples](#examples)
@@ -101,8 +102,8 @@ MUST be named `Interface.json` and in the same folder as python file!
 All of the following items will be refered to as `elements`:
 - Frame
 - Label
-- Button (not implemented yet)
-- Switch (...)
+- Button
+- Switch (not implemented yet)
 - Slider (...)
 - Dropdown (...)
 
@@ -114,9 +115,9 @@ These attributes can be given to any element type
 - `position: [x,y]` Sets position from top-left of screen to top-left of element boundry box.
 - `size: [x,y]` Sets the size of the element boundry box.
 - `background_color: (r,g,b)` The boundry box will be filled with this color. Don't set this for transparency.
-- `is_visible: bool` Speaks for itself really (default = true).
-- `is_hoverable: bool` (not implemented yet)
-- `is_clickable: bool` (...)
+- `is_visible: bool` (default = true).
+- `is_hoverable: bool` (default = false).
+- `is_clickable: bool` (default = false).
 
 ### Frame
 - `contents: {}` See [frames](#frames) for more info.
@@ -131,6 +132,18 @@ These attributes can be given to any element type
 - `font_bold: bool` (default = false)
 - `font_italic: bool` (default = false)
 - `auto_size: bool` This will overwrite size of the boundry box to fit the text within (default = false).
+
+### Button
+
+- `contents: {}` The button is basically just a frame with the following default attributes added to it. Making a button manually from a frame is possible, but deprecated.
+- `is_clickable: bool` (default = true)
+- `is_hoverable: bool` (default = true)
+- `click_start: bool` (default = false)
+- `click_end: bool` (default = false)
+- `held: bool` (default = false)
+- `hover_start: bool` (default = false)
+- `hover_end: bool` (default = false)
+- `hovered: bool` (default = false)
 
 ## Frames
 
@@ -171,6 +184,37 @@ Arthur->Bertha->Pippinpaddleopsicopolis
 ```
 
 ## Examples
+
+### A button
+
+```json
+{
+   "button": {
+      "name": "harry the button",
+      "position": [250,120],
+      "size": [200,200],
+      "background_color": [100,0,0],
+      "contents": {
+         "label": {
+            "name": "jonathan the label",
+            "position": [260,150],
+            "font_size": 30,
+            "auto_size": true
+         }
+      }
+   }
+}
+```
+With this called after `pygame_ui.init()`:
+```python
+harry = Interface.get_element('harry the button', 'frame1->frame2')
+jonathan = Interface.get_element('jonathan the label', 'frame1->frame2->harry the button')
+```
+And this between `event_handler()` and `draw()`:
+```python
+jonathan.text = "start: "+str(harry.click_start)+", end: "+str(harry.click_end)+", held: "+str(harry.held)
+```
+
 
 ### Adding An Element Post Initialization
 
