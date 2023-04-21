@@ -1,7 +1,7 @@
 
 # Pygame UI README
 
-[Pygame UI](https://github.com/RednaxGaming/pygame_ui) is a module for building user interfaces in [pygame](https://www.pygame.org/).
+[Pygame UI](https://github.com/RednaxGaming/pygame_ui) is a package for building user interfaces in [pygame](https://www.pygame.org/).
 
 It is currently a work in progress, but if you wanna test it out, feel free to do so :)
 
@@ -184,6 +184,8 @@ Arthur->Bertha->Pippinpaddleopsicopolis
 ```
 
 ## Examples
+
+All examples use [this](#python-file) python file as base.
 
 ### A button
 
