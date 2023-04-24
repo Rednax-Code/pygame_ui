@@ -16,11 +16,14 @@ __version__ = '0.0.0.3'
 #print('Pygame UI ' + __version__)
 
 def test():
-    import pygame_ui.base
-    import pygame_ui.constants
-    import pygame_ui.elements
-    print('Successfully installed! enjoy :)\nversion: '+__version__)
-    del pygame_ui.base, pygame_ui.constants, pygame_ui.elements
+	try:
+		import pygame_ui.base
+		import pygame_ui.constants
+		import pygame_ui.elements
+		print('Successfully installed! enjoy :)\nversion: '+__version__)
+		del pygame_ui.base, pygame_ui.constants, pygame_ui.elements
+	except:
+		print(ISSUE_REPORT)
 
 # Base64
 # VGhpcyBjb2RlIHdhcyB3cml0dGVuIGJ5IFJlZG5heEdhbWluZyBvbiBnaXRodWI=

@@ -20,6 +20,8 @@ It is currently a work in progress, but if you wanna test it out, feel free to d
    - [Frame](#frame)
    - [Label](#label)
    - [Button](#button)
+   - [Switch](#switch)
+   - [Slider](#slider)
 - [Frames](#frames)
    - [Frame Path](#frame-path)
 - [Examples](#examples)
@@ -31,7 +33,7 @@ It is currently a work in progress, but if you wanna test it out, feel free to d
 
 Pygame UI is available on PyPi:
 
-```cmd
+```shell
 pip install pygame-json-ui
 ```
 In case this doesn't work, you'll need to manually add the pygame_ui folder to your site-packages.
@@ -48,13 +50,15 @@ Version: x.x.x.x
 
 You will have two files in the same folder:
 - whatever.py
-- Interface.json <-- Specifically with that name and capitalization!
+- Interface.json <-- Name for automatically loading the file
+
+If you prefer a different name for the json file, or Pygame UI is having issues locating it automatically, you can pass the absolute path to it's parent folder as an argument for `pygame_ui.init()`.
 
 Here a simple example for making a label:
 
 #### Python File
 
-Notice that the `event_handler` is actually not required unless you want interactive elements to function as expected.
+Notice that the `event_handler` is not required unless you want interactive elements to function as expected.
 
 ```python
 import pygame
@@ -88,7 +92,7 @@ while True:
 ```
 
 #### JSON File
-MUST be named `Interface.json` and in the same folder as python file!
+MUST be named `Interface.json` and in the same folder as python file for loading the json file automatically!
 
 ```json
 {
@@ -110,21 +114,21 @@ All of the following items will be refered to as `elements`:
 - Frame
 - Label
 - Button
-- Switch (not implemented yet)
-- Slider (...)
-- Dropdown (...)
+- Switch
+- Slider
+- Dropdown (Coming soon)
 
 ## Attribute List
-
+- `attribute: type` description (default value).
 ### General
 These attributes can be given to any element type
-- `name: str` MUST be given to every element.
-- `position: [x,y]` Sets position from top-left of screen to top-left of element boundry box.
-- `size: [x,y]` Sets the size of the element boundry box.
-- `background_color: (r,g,b)` The boundry box will be filled with this color. Don't set this for transparency.
-- `is_visible: bool` (default = true).
-- `is_hoverable: bool` (default = false).
-- `is_clickable: bool` (default = false).
+- `name: str` REQUIRED, used to access the element in python.
+- `position: [x,y]` Sets position from top-left of screen to top-left of element boundry box ([0, 0]).
+- `size: [x,y]` Sets the size of the element boundry box ([0, 0]).
+- `background_color: (r,g,b)` The boundry box will be filled with this color (none).
+- `is_visible: bool` (true).
+- `is_hoverable: bool` (false).
+- `is_clickable: bool` (false).
 
 ### Frame
 - `contents: {}` See [frames](#frames) for more info.
@@ -132,30 +136,56 @@ These attributes can be given to any element type
 ### Label
 
 - `text: str` Exactly what you think it is.
-- `text_color: (r,g,b)` (default = (255,255,255))
-- `text_aa: bool` anti-aliasing (default = true)
-- `font_name: str` (default = 'Arial')
-- `font_size: int` (default = 10)
-- `font_bold: bool` (default = false)
-- `font_italic: bool` (default = false)
-- `auto_size: bool` This will overwrite size of the boundry box to fit the text within (default = false).
+- `text_color: (r,g,b)` ([255,255,255])
+- `text_aa: bool` anti-aliasing (true)
+- `font_name: str` ('Arial')
+- `font_size: int` (10)
+- `font_bold: bool` (false)
+- `font_italic: bool` (false)
+- `auto_size: bool` This will overwrite size of the boundry box to fit the text within (false).
 
 ### Button
 
 - `contents: {}` The button is basically just a frame with the following default attributes added to it. Making a button manually from a frame is possible, but deprecated.
-- `is_clickable: bool` (default = true)
-- `is_hoverable: bool` (default = true)
-- `click_start: bool` (default = false)
-- `click_end: bool` (default = false)
-- `held: bool` (default = false)
-- `hover_start: bool` (default = false)
-- `hover_end: bool` (default = false)
-- `hovered: bool` (default = false)
+- `is_clickable: bool` (true)
+- `is_hoverable: bool` (true)
+- `click_start: bool` (false)
+- `click_end: bool` (false)
+- `click_held: bool` (false)
+- `hover_start: bool` (false)
+- `hover_end: bool` (false)
+- `hover_held: bool` (false)
+
+### Switch
+- `state: bool` Represents the current state of the switch on/off (false)
+- `preset: str` A preset for it's looks. Only existing preset is currently: "simple" (none)
+- `is_clickable: bool` (true)
+- `is_hoverable: bool` (true)
+- `click_start: bool` (false)
+- `click_end: bool` (false)
+- `click_held: bool` (false)
+- `hover_start: bool` (false)
+- `hover_end: bool` (false)
+- `hover_held: bool` (false)
+
+### Slider
+- `value_min: int/float` Lower end of the slider (0)
+- `value_max: int/float` Uppper end of the slider (1)
+- `value: int/float` Represents the current value of the slider (0)
+- `preset: str` A preset for it's looks. Only existing preset is currently: "simple" (none)
+- `is_clickable: bool` (true)
+- `is_hoverable: bool` (true)
+- `click_start: bool` (false)
+- `click_end: bool` (false)
+- `click_held: bool` (false)
+- `hover_start: bool` (false)
+- `hover_end: bool` (false)
+- `hover_held: bool` (false)
 
 ## Frames
 
 Frames can contain `elements` Just like how a folder can contain files and other folders.
-Frames can also hold other frames, and yes, those can contain frames aswell (see [Frame-ception](#frame-ception)). When a frame is invisible, it's `elements` will also be invisable. Deleting a frame will also delete it's `elements`.
+Frames can also hold other frames, and yes, those can contain frames aswell (see [Frame-ception](#frame-ception)). When a frame is invisible, it's `elements` will also be invisible. Deleting a frame will also delete it's `elements`.
 
 ### Frame Path
 
@@ -186,8 +216,8 @@ Say we have the following json file
 and i wanted to access `Pippinpaddleopsicopolis`
 
 The syntax for the frame path is very simple:
-```
-Arthur->Bertha->Pippinpaddleopsicopolis
+```python
+"Arthur->Bertha->Pippinpaddleopsicopolis"
 ```
 
 ## Examples

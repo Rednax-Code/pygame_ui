@@ -81,28 +81,38 @@ class Graphical_UI:
 		>>> for event in pygame.event.get():
 			Interface.event_handler(event)
 		"""
+
 		self.get_interactive_elements()
 
 		element = None
+		lmb, rmb, mmb = pygmouse.get_pressed(3)
+		mpos = pygmouse.get_pos()
 		
 		for i in self.interactive_elements:
-			if i.is_clickable or i.is_hoverable:
-				mouse_in_boundry = i.rectangle.collidepoint(pygmouse.get_pos())
-			
+			mouse_in_boundry = i.rectangle.collidepoint(mpos)
+
 			if mouse_in_boundry:
 				if event.type in [pyglocal.MOUSEBUTTONDOWN, pyglocal.MOUSEBUTTONUP] and i.is_clickable:
 					element = i
 				elif event.type in [pyglocal.MOUSEMOTION, pyglocal.MOUSEWHEEL] and i.is_hoverable:
 					element = i
+			elif event.type in [pyglocal.MOUSEBUTTONUP, pyglocal.MOUSEMOTION, pyglocal.MOUSEWHEEL] and i.click_held:
+				element = i
+			
+			if event.type == pyglocal.MOUSEBUTTONUP and lmb == 0:
+				i.click_end = True
+				i.click_held = False
 
 		if element != None:
-			if event.type == pyglocal.MOUSEBUTTONDOWN and pygmouse.get_pressed(3)[0] == 1:
+			if event.type in [pyglocal.MOUSEMOTION, pyglocal.MOUSEWHEEL]:
+				if isinstance(element, pygame_ui.slider) and element.click_held:
+					i.set_value_from_pos(mpos)
+
+			elif event.type == pyglocal.MOUSEBUTTONDOWN and lmb == 1:
 				element.click_start = True
-				element.held = True
-		
-			elif event.type == pyglocal.MOUSEBUTTONUP and pygmouse.get_pressed(3)[0] == 0:
-				element.click_end = True
-				element.held = False
+				element.click_held = True
+				if isinstance(element, pygame_ui.switch):
+					element.state = not element.state
 
 		return 1
 	
@@ -121,6 +131,7 @@ class Graphical_UI:
 					i.draw_bg(pygame_window)
 				i.draw(pygame_window)
 		
+		# Reset all temporary attribute values
 		for i in self.interactive_elements:
 			if i.is_clickable:
 				i.click_start = False
