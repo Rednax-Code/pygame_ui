@@ -1,7 +1,9 @@
 
 # Pygame UI README
 
-[Pygame UI](https://github.com/RednaxGaming/pygame_ui) is a package for building user interfaces in [pygame](https://www.pygame.org/).
+[![Licence](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+[Pygame UI](https://github.com/RednaxGaming/pygame_ui) is a package for building user interfaces for [pygame](https://www.pygame.org/) in JSON.
 
 It is currently a work in progress, but if you wanna test it out, feel free to do so :)
 
@@ -27,7 +29,12 @@ It is currently a work in progress, but if you wanna test it out, feel free to d
 
 ### Installation
 
-First of all, you'll need to manually add the pygame_ui folder to your site-packages, because the module is not yet available on pip.
+Pygame UI is available on PyPi:
+
+```cmd
+pip install pygame-json-ui
+```
+In case this doesn't work, you'll need to manually add the pygame_ui folder to your site-packages.
 
 When this is done you can test your installation, by executing the following:
 ```python
