@@ -143,7 +143,7 @@ def init(path_to_json:str='Interface.json'):
 	try:
 		file = open(os.path.abspath(path_to_json))
 	except FileNotFoundError:
-		raise FileNotFoundError(path_to_json+' does not exist.\n'+ISSUE_REPORT)
+		print(ISSUE_REPORT)
 	UI = json.load(file)
 	file.close()
 

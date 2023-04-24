@@ -1,5 +1,6 @@
 import pygame
 import pygame_ui # Addition
+import os.path
 
 pygame.init()
 
