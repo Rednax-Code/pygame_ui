@@ -132,19 +132,18 @@ class Graphical_UI:
 		return 1
 
 
-def init():
+def init(path_to_json:str='Interface.json'):
 	"""
 	This loads in the ``Interface.json`` file and created a GUI with it
 	"""
 
 	import json
 	import os
-	from pathlib import Path
-
-	for i in os.listdir():
-		if os.path.isdir(i):
-			pass
-	file = open(os.path.abspath('Interface.json'))
+	
+	try:
+		file = open(os.path.abspath(path_to_json))
+	except FileNotFoundError:
+		raise FileNotFoundError(path_to_json+' does not exist.\n'+ISSUE_REPORT)
 	UI = json.load(file)
 	file.close()
 
