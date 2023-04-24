@@ -139,9 +139,12 @@ def init():
 
 	import json
 	import os
-	
+	from pathlib import Path
 
-	file = open(os.getcwd()+'\\Interface.json')
+	for i in os.listdir():
+		if os.path.isdir(i):
+			pass
+	file = open(os.path.abspath('Interface.json'))
 	UI = json.load(file)
 	file.close()
 
