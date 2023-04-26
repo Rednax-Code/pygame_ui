@@ -11,7 +11,7 @@ from pygame_ui.base import *
 from pygame_ui.elements import *
 
 # release, year, month, session
-__version__ = '0.0.0.3'
+__version__ = '0.0.0.4'
 
 #print('Pygame UI ' + __version__)
 

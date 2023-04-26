@@ -1,32 +1,32 @@
 {
-	"frame": {
-		"name": "main",
+	"main": {
+		"type": "frame",
 		"position": [50,50],
 		"size": [1180,620],
 		"background_color": [10,10,100],
 		"contents": {
-			"switch": {
-				"name": "jason the switch",
+			"jason the switch": {
+				"type": "switch",
 				"position": [100,100],
 				"size": [200,50],
 				"background_color": [25,131,133],
 				"preset": "simple"
 			},
-			"frame": {
-				"name": "examples",
+			"examples": {
+				"type": "frame",
 				"position": [350,100],
 				"size": [540,500],
 				"is_visible": false,
 				"background_color": [0,50,100],
 				"contents": {
-					"button": {
-						"name": "harry the button",
+					"harry the button": {
+						"type": "button",
 						"position": [370,120],
 						"size": [160,100],
 						"background_color": [100,0,0],
 						"contents": {
-							"label": {
-								"name": "jonathan",
+							"jonathan": {
+								"type": "label",
 								"text": "Hold me :)",
 								"position": [390,150],
 								"font_size": 30,
@@ -34,15 +34,15 @@
 							}
 						}
 					},
-					"slider": {
-						"name": "vincent the slider",
+					"vincent the slider": {
+						"type": "slider",
 						"position": [370,240],
 						"size": [350,50],
 						"background_color": [90,90,90],
 						"preset": "simple"
 					},
-					"label": {
-						"name": "slider label",
+					"slider label": {
+						"type": "label",
 						"text": "value = ",
 						"position": [740,240],
 						"font_size": 30,

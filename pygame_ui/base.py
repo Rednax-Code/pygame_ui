@@ -17,8 +17,9 @@ class Graphical_UI:
 	interactive_elements = []
 
 	def __init__(self, objects:dict):
-		for item_type, data in objects.items():
-			self.elements[data['name']] = getattr(pygame_ui.elements, item_type)(data)
+		for name, data in objects.items():
+			element_type = data.pop('type')
+			self.elements[name] = getattr(pygame_ui.elements, element_type)(data)
 
 	def get_frame(self, frame_path:str=''):
 		"""

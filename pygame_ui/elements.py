@@ -72,8 +72,9 @@ class frame(UI_Element):
 	def __init__(self, *initial_data, **kwargs):
 		self.elements = {}
 		super().__init__(initial_data, kwargs)
-		for item_type, data in self.contents.items():
-			self.elements[data['name']] = globals()[item_type](data)
+		for name, data in self.contents.items():
+			element_type = data.pop('type')
+			self.elements[name] = globals()[element_type](data)
 	
 	def get_interactive_elements(self):
 		interactives = []
