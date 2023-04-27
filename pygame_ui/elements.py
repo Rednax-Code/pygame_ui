@@ -24,6 +24,7 @@ class UI_Element:
 	is_clickable = False
 	position = [0,0]
 	size = [0,0]
+	anchor = "absolute"
 	auto_size = False
 	background_color = None
 
@@ -71,8 +72,9 @@ class frame(UI_Element):
 	def __init__(self, *initial_data, **kwargs):
 		self.elements = {}
 		super().__init__(initial_data, kwargs)
-		for item_type, data in self.contents.items():
-			self.elements[data['name']] = globals()[item_type](data)
+		for name, data in self.contents.items():
+			element_type = data.pop('type')
+			self.elements[name] = globals()[element_type](data)
 	
 	def get_interactive_elements(self):
 		interactives = []
@@ -90,17 +92,6 @@ class frame(UI_Element):
 				if i.background_color != None:
 					i.draw_bg(pygame_window)
 				i.draw(pygame_window)
-
-
-class button(frame):
-	is_clickable = True
-	is_hoverable = True
-	click_start = False
-	click_end = False
-	held = False
-	hover_start = False
-	hover_end = False
-	hovered = False
 
 
 class label(UI_Element):
@@ -142,27 +133,88 @@ class label(UI_Element):
 		pygame_window.blit(text_render, self.position)
 
 
-class switch(UI_Element):
+class button(frame):
+	"""
+	The UI element for a button.
+
+	What does this button do?
+	"""
 	is_clickable = True
+	is_hoverable = True
+	click_start = False
+	click_end = False
+	click_held = False
+	hover_start = False
+	hover_end = False
+	hover_held = False
+
+
+class switch(UI_Element):
+	"""
+	The UI element for a switch.
+
+	Switcharoo!
+	"""
+	is_clickable = True
+	is_hoverable = True
+	click_start = False
+	click_end = False
+	click_held = False
+	hover_start = False
+	hover_end = False
+	hover_held = False
+	state = False
+	preset = None
 
 	def __init__(self, *initial_data, **kwargs):
 		super().__init__(initial_data, kwargs)
 
 	def draw(self, pygame_window):
-		pass
+		if self.preset == 'simple':
+			size = [self.size[0]/2-5, self.size[1]-10]
+			position = [self.position[0]+5+size[0]*int(self.state), self.position[1]+5]
+			pygdraw.rect(pygame_window, (200,200,200), pygrect.Rect(position, size))
 
 
 class slider(UI_Element):
+	"""
+	The UI element that slides.
+
+	Sliiide to the left, sliiide to the right, criss cross!
+	"""
 	is_clickable = True
+	is_hoverable = True
+	click_start = False
+	click_end = False
+	click_held = False
+	hover_start = False
+	hover_end = False
+	hover_held = False
+	value_min = 0
+	value_max = 1
+	value = 0
+	preset = None
 
 	def __init__(self, *initial_data, **kwargs):
 		super().__init__(initial_data, kwargs)
 
+	def set_value_from_pos(self, position):
+		if self.preset == 'simple':
+			self.value/(self.value_max-self.value_min)
+			x = (self.value_max - self.value_min) * (position[0]-self.size[1]/2 - self.position[0])/(self.size[0]-self.size[1])
+			self.value = max(min(self.value_max, x), self.value_min)
+
 	def draw(self, pygame_window):
-		pass
+		if self.preset == 'simple':
+			size = [self.size[1]-10, self.size[1]-10]
+			position = [self.position[0]+5+(self.size[0]-self.size[1])*self.value/(self.value_max-self.value_min), self.position[1]+5]
+			pygdraw.rect(pygame_window, (200,200,200), pygrect.Rect(position, size))
 
 
 class dropdown(UI_Element):
+	"""
+	Unfinished
+	"""
 	is_clickable = True
 
 	def __init__(self, *initial_data, **kwargs):
