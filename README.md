@@ -96,8 +96,8 @@ MUST be named `Interface.json` and in the same folder as python file for loading
 
 ```json
 {
-   "label": {
-      "name": "test_label",
+   "test_label": {
+      "type": "label",
       "position": [200,100],
       "size": [120,80],
       "background_color": [200,0,0],
@@ -119,10 +119,10 @@ All of the following items will be refered to as `elements`:
 - Dropdown (Coming soon)
 
 ## Attribute List
-- `attribute: type` description (default value).
+- `attribute: data type` description (default value).
 ### General
 These attributes can be given to any element type
-- `name: str` REQUIRED, used to access the element in python.
+- `type: str` REQUIRED, specifies which element this is choose from [this](#element-list) list.
 - `position: [x,y]` Sets position from top-left of screen to top-left of element boundry box ([0, 0]).
 - `size: [x,y]` Sets the size of the element boundry box ([0, 0]).
 - `background_color: (r,g,b)` The boundry box will be filled with this color (none).
@@ -194,19 +194,19 @@ A frame path is a string representation of the route to a certain frame.
 Say we have the following json file
 ```json
 {
-   "frame": {
-      "name": "Arthur"
+   "Arthur": {
+      "type": "frame"
       "contents": {
-         "frame": {
-            "name": "Bertha"
+         "Bertha": {
+            "type": "frame"
             "contents": {
-               "frame": {
-                  "name": "Pippinpaddleopsicopolis"
+               "Pippinpaddleopsicopolis": {
+                  "type": "frame"
                }
             }
          },
-         "frame": {
-            "name": "Cedric"
+         "Cedric": {
+            "type": "frame"
          }
       }
    }
@@ -228,14 +228,14 @@ All examples use [this](#python-file) python file as base.
 
 ```json
 {
-   "button": {
-      "name": "harry the button",
+   "harry the button": {
+      "type": "button",
       "position": [250,120],
       "size": [200,200],
       "background_color": [100,0,0],
       "contents": {
-         "label": {
-            "name": "jonathan the label",
+         "jonathan the label": {
+            "type": "label",
             "position": [260,150],
             "font_size": 30,
             "auto_size": true
@@ -319,8 +319,8 @@ while True:
 #### JSON
 ```json
 {
-   "frame": {
-      "name": "frame0",
+   "frame0": {
+      "type": "frame",
       "contents": {}
    }
 }
