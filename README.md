@@ -19,6 +19,7 @@ It is currently a work in progress, but if you wanna test it out, feel free to d
    - [General](#general)
    - [Frame](#frame)
    - [Label](#label)
+   - [Text Input](#text-input)
    - [Button](#button)
    - [Switch](#switch)
    - [Slider](#slider)
@@ -124,6 +125,8 @@ All of the following items will be refered to as `elements`:
 These attributes can be given to any element type
 - `type: str` REQUIRED, specifies which element this is choose from [this](#element-list) list.
 - `position: [x,y]` Sets position from top-left of screen to top-left of element boundry box ([0, 0]).
+- `position_anchor: str` "top/center/bottom left/center/right" or "center" ("top left").
+- `position_relative: bool` Whether given position will be interpreted as relative to parent or absolute (false).
 - `size: [x,y]` Sets the size of the element boundry box ([0, 0]).
 - `background_color: (r,g,b)` The boundry box will be filled with this color (none).
 - `is_visible: bool` (true).
@@ -143,6 +146,15 @@ These attributes can be given to any element type
 - `font_bold: bool` (false)
 - `font_italic: bool` (false)
 - `auto_size: bool` This will overwrite size of the boundry box to fit the text within (false).
+
+### Text Input
+
+- `typing_start_on_click: bool` Will set typing to True when the hitbox is clicked (true).
+- `typing_end_on_enter: bool` Will set typing to False when `enter` is pressed (true).
+- `typing: bool` Whether or not the users button presses will be processed (false).
+- `text: str` The currently typed string ("Your text here").
+- `caret: bool` Only used for backend (false).
+- `caret_timer: float` Only used for backend (0).
 
 ### Button
 

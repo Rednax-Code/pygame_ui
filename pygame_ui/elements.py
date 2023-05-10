@@ -2,7 +2,6 @@
 blabla
 """
 
-from importlib import import_module
 import os
 import sys
 
@@ -23,8 +22,9 @@ class UI_Element:
 	is_hoverable = False
 	is_clickable = False
 	position = [0,0]
+	position_anchor = "top left"
+	position_relative = False
 	size = [0,0]
-	anchor = "absolute"
 	auto_size = False
 	background_color = None
 
@@ -32,16 +32,24 @@ class UI_Element:
 		for dictionary in initial_data:
 			for key in dictionary:
 				setattr(self, key, dictionary[key])
+		self.parent = kwargs.pop('parent')
 		for key in kwargs:
 			setattr(self, key, kwargs[key])
-		
-		self.rectangle = pygrect.Rect(self.position, self.size)
-	
+
+		self.change_position(self.position)
+
 	def change_position(self, new_position):
 		"""
 		You can figure this one out yourself. If you can't then... *sigh*
 		"""
-		self.position = new_position
+		position_zero = [0,0]
+		if self.position_relative:
+			position_zero = [position_zero[i] + self.parent.position[i] for i in [0,1]]
+		if self.position_anchor == 'center':
+			anchor = [0,0]
+		else:
+			anchor = [ANCHORS[self.position_anchor.split(' ')[i]] for i in [1,0]]
+		self.position = [new_position[i] - (anchor[i]/2+.5)*self.size[i] + position_zero[i] for i in [0,1]]
 		self.rectangle = pygrect.Rect(self.position, self.size)
 
 	def change_size(self, new_size):
@@ -49,7 +57,7 @@ class UI_Element:
 		You can figure this one out yourself. If you can't then... *sigh*
 		"""
 		self.size = new_size
-		self.rectangle = pygrect.Rect(self.position, self.size)
+		self.change_position(self.position)
 	
 	def draw_bg(self, pygame_window):
 		if self.auto_size:
@@ -74,8 +82,18 @@ class frame(UI_Element):
 		super().__init__(initial_data, kwargs)
 		for name, data in self.contents.items():
 			element_type = data.pop('type')
-			self.elements[name] = globals()[element_type](data)
+			self.elements[name] = globals()[element_type](data, parent=self)
 	
+	def get_text_input_elements(self):
+		text_input_elements = []
+		for name, element in self.elements.items():
+			if element.is_visible:
+				if isinstance(element, frame):
+					text_input_elements.extend(element.get_text_input_elements())
+				elif isinstance(element, text_input):
+					text_input_elements.append(element)
+		return text_input_elements
+
 	def get_interactive_elements(self):
 		interactives = []
 		for name, element in self.elements.items():
@@ -129,8 +147,33 @@ class label(UI_Element):
 		self.font = pygfont.SysFont(self.font_name, self.font_size, self.font_bold, self.font_italic)
 
 	def draw(self, pygame_window):
-		text_render = self.font.render(self.text, self.text_aa, self.text_color, self.background_color)
-		pygame_window.blit(text_render, self.position)
+		text_surface = self.font.render(self.text, self.text_aa, self.text_color, self.background_color)
+		pygame_window.blit(text_surface, self.position)
+
+
+class text_input(label):
+	"""
+	The UI element for an input field.
+
+	My quote-bucket is empty :(
+	"""
+	is_clickable = True
+	click_start = False
+	click_end = False
+	click_held = False
+	typing_start_on_click = True
+	typing_end_on_enter = True
+	typing = False
+	text = "Your input here"
+	caret = False
+	caret_timer = 0
+
+	def draw(self, pygame_window):
+		text_to_render = self.text
+		if self.caret:
+			text_to_render += '|'
+		text_surface = self.font.render(text_to_render, self.text_aa, self.text_color, self.background_color)
+		pygame_window.blit(text_surface, self.position)
 
 
 class button(frame):
