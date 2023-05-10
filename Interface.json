@@ -21,14 +21,33 @@
 				"contents": {
 					"harry the button": {
 						"type": "button",
-						"position": [370,120],
+						"position": [20,20],
+						"position_relative": true,
 						"size": [160,100],
 						"background_color": [100,0,0],
 						"contents": {
 							"jonathan": {
 								"type": "label",
 								"text": "Hold me :)",
-								"position": [390,150],
+								"position": [20,30],
+								"position_relative": true,
+								"font_size": 30,
+								"auto_size": true
+							}
+						}
+					},
+					"tamara the button": {
+						"type": "button",
+						"position": [200,20],
+						"position_relative": true,
+						"size": [160,100],
+						"background_color": [100,0,0],
+						"contents": {
+							"jackie": {
+								"type": "label",
+								"text": "Hover here",
+								"position": [20,30],
+								"position_relative": true,
 								"font_size": 30,
 								"auto_size": true
 							}
@@ -36,7 +55,8 @@
 					},
 					"vincent the slider": {
 						"type": "slider",
-						"position": [370,240],
+						"position": [20,140],
+						"position_relative": true,
 						"size": [350,50],
 						"background_color": [90,90,90],
 						"preset": "simple"
@@ -44,9 +64,20 @@
 					"slider label": {
 						"type": "label",
 						"text": "value = ",
-						"position": [740,240],
+						"position": [390,140],
+						"position_relative": true,
 						"font_size": 30,
 						"auto_size": true
+					},
+					"julia the text input": {
+						"type": "text_input",
+						"text": "Hubba",
+						"font_size": 25,
+						"font_name": "monospace",
+						"position": [20,240],
+						"position_relative": true,
+						"size": [350,50],
+						"background_color": [90,90,90]
 					}
 				}
 			}
