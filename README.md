@@ -114,6 +114,7 @@ MUST be named `Interface.json` and in the same folder as python file for loading
 All of the following items will be refered to as `elements`:
 - Frame
 - Label
+- Text Input
 - Button
 - Switch
 - Slider
