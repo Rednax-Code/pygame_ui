@@ -1,7 +1,9 @@
 
 # Pygame UI README
 
-[![Licence](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Licence](https://img.shields.io/badge/license-MIT-informational.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.0.1-informational.svg)]()
+[![Downloads](https://static.pepy.tech/personalized-badge/pygame-json-ui?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=downloads)](https://pepy.tech/project/pygame-json-ui)
 
 [Pygame UI](https://github.com/RednaxGaming/pygame_ui) is a package for building user interfaces for [pygame](https://www.pygame.org/) in JSON.
 
