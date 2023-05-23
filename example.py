@@ -10,14 +10,13 @@ screen = pygame.display.set_mode((width, height), flags, vsync=1)
 pygame.display.set_caption("UI Test")
 clock = pygame.time.Clock()
 
-
 # Initializing interface
 Interface = pygame_ui.init() # Addition
 
 examples_frame = Interface.get_frame('main->examples')
 jason = Interface.get_element('jason the switch', 'main')
-harry = Interface.get_element('harry the button', 'main->examples')
-jonathan = harry.elements['jonathan']
+harry = examples_frame.elements['harry the button']
+tamara = examples_frame.elements['tamara the button']
 slider = examples_frame.elements['vincent the slider']
 slider_label = examples_frame.elements['slider label']
 
@@ -33,11 +32,17 @@ while True:
 	if examples_frame.is_visible != jason.state:
 		examples_frame.is_visible = jason.state
 
-	# Change button color on hold
+	# Change button harry's color on hold
 	if harry.click_held:
 		harry.background_color = (20,100,20)
 	else:
 		harry.background_color = (100,0,0)
+	
+	# Change button tamara's color on hover
+	if tamara.hover_held:
+		tamara.background_color = (20,100,20)
+	else:
+		tamara.background_color = (100,0,0)
 	
 	# Update value of slider
 	slider_label.text = "value = "+str(round(slider.value, 2))
