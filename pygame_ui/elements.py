@@ -35,6 +35,7 @@ class UI_Element:
 	use_sdl2 = False
 
 	def __init__(self, initial_data, kwargs):
+		renderer = initial_data[0].pop('renderer')
 		for dictionary in initial_data:
 			for key in dictionary:
 				setattr(self, key, dictionary[key])
@@ -47,6 +48,16 @@ class UI_Element:
 		self.size_initial = list(self.size)
 		self.change_position(self.position, self.position_units)
 		self.change_size(self.size, self.size_units)
+
+		if self.use_sdl2:
+			if self.background_color != None:
+				if len(self.background_color) < 4:
+					bg_c = self.background_color + [255]
+				else:
+					bg_c = self.background_color
+				image = pygsurface.Surface(self.size).convert_alpha()
+				image.fill(bg_c)
+				self.texture = pygsdl2.Texture.from_surface(renderer, image)
 
 	def change_position(self, new_position, units=['px','px']):
 		"""
@@ -121,18 +132,11 @@ class UI_Element:
 		pygame_window.blit(draw_surface, [0,0])
 	
 	def draw_bg_sdl2(self, renderer):
-		if len(self.background_color) < 4:
-			bg_c = self.background_color + [255]
-		else:
-			bg_c = self.background_color
-
 		# This works but i don't like it, it's not pretty and could probably be faster
-		image = pygsurface.Surface(pygdisplay.get_surface().get_size()).convert_alpha()
-		image.fill(bg_c)
-		image = pygsdl2.Texture.from_surface(renderer, image)
-		renderer.blit(image, self.rectangle)
+		renderer.blit(self.texture, self.rectangle)
 		# Something like this below would make more sense, but i couldn't get the alpha channel to work :(
 		#renderer.draw_color = bg_c
+		#renderer.alpha = bg_c[3]
 		#renderer.fill_rect(self.rectangle)
 
 
@@ -147,9 +151,14 @@ class frame(UI_Element):
 
 	def __init__(self, *initial_data, **kwargs):
 		self.elements = {}
+		if initial_data[0]['use_sdl2']:
+			renderer = initial_data[0]['renderer']
 		super().__init__(initial_data, kwargs)
 		for name, data in self.contents.items():
 			element_type = data.pop('type')
+			data['use_sdl2'] = bool(self.use_sdl2)
+			if self.use_sdl2:
+				data['renderer'] = renderer
 			self.elements[name] = globals()[element_type](data, parent=self)
 	
 	def get_text_input_elements(self):

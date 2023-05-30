@@ -24,11 +24,13 @@ class Graphical_UI:
 	old_time = time()
 	new_time = time()
 
-	def __init__(self, objects:dict, use_sdl2=False):
+	def __init__(self, objects:dict, use_sdl2=False, renderer=None):
 		self.use_sdl2 = use_sdl2
 		for name, data in objects.items():
 			element_type = data.pop('type')
 			data['use_sdl2'] = use_sdl2
+			if renderer != None:
+				data['renderer'] = renderer
 			self.elements[name] = getattr(pygame_ui.elements, element_type)(data, parent=None)
 
 	def get_frame(self, frame_path:str=''):
@@ -258,7 +260,7 @@ class Graphical_UI:
 		return 1
 
 
-def init(path_to_json:str='Interface.json', use_sdl2=False):
+def init(path_to_json:str='Interface.json', use_sdl2=False, renderer=None):
 	"""
 	This loads in the ``Interface.json`` file and created a GUI with it
 	"""
@@ -273,7 +275,7 @@ def init(path_to_json:str='Interface.json', use_sdl2=False):
 	UI = json.load(file)
 	file.close()
 
-	interface = Graphical_UI(UI, use_sdl2)
+	interface = Graphical_UI(UI, use_sdl2, renderer)
 
 	# clearing up namespace
 	del json, os, pygame_ui.elements
