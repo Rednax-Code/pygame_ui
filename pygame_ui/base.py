@@ -107,7 +107,7 @@ class Graphical_UI:
 		for i in self.interactive_elements:
 			mouse_in_boundry = i.rectangle.collidepoint(mpos)
 
-			# Add exception to hoverable elements to fix hover_exit
+			# Add exception to hoverable elements to fix hover_end
 			exception = False
 			if i.is_hoverable:
 				if i.hover_held:

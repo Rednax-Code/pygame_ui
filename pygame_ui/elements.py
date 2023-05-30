@@ -8,6 +8,8 @@ import sys
 import pygame.font as pygfont
 import pygame.rect as pygrect
 import pygame.draw as pygdraw
+import pygame.display as pygdisplay
+import pygame.surface as pygsurface
 
 from pygame_ui.constants import *
 
@@ -24,7 +26,9 @@ class UI_Element:
 	position = [0,0]
 	position_anchor = "top left"
 	position_relative = False
+	position_unit = "pixels" # or "percentage" (doesn't work yet)
 	size = [0,0]
+	size_units = "pixels" # or "percentage" (doesn't work yet)
 	auto_size = False
 	background_color = None
 
@@ -60,12 +64,20 @@ class UI_Element:
 		self.change_position(self.position)
 	
 	def draw_bg(self, pygame_window):
+		draw_surface = pygsurface.Surface(pygdisplay.get_surface().get_size()).convert_alpha()
+		draw_surface.fill((0,0,0,0))
+
 		if self.auto_size:
 			if isinstance(self, label):
 				auto_rect = pygrect.Rect(self.position, self.font.size(self.text))
-			pygdraw.rect(pygame_window, self.background_color, auto_rect)
+			pygdraw.rect(draw_surface, self.background_color, auto_rect)
 		else:
-			pygdraw.rect(pygame_window, self.background_color, self.rectangle)
+			pygdraw.rect(draw_surface, self.background_color, self.rectangle)
+		
+		if len(self.background_color) < 4:
+			draw_surface.set_alpha(255)
+
+		pygame_window.blit(draw_surface, [0,0])
 
 
 class frame(UI_Element):
