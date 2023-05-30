@@ -7,8 +7,11 @@
 		"contents": {
 			"jason the switch": {
 				"type": "switch",
-				"position": [100,100],
-				"size": [200,50],
+				"position": [100,50],
+				"position_units": ["px", "h%"],
+				"position_anchor": "top left",
+				"size": [15.625,50],
+				"size_units": ["w%", "px"],
 				"background_color": [25,131,133],
 				"preset": "simple"
 			},

@@ -26,9 +26,9 @@ class UI_Element:
 	position = [0,0]
 	position_anchor = "top left"
 	position_relative = False
-	position_unit = "pixels" # or "percentage" (doesn't work yet)
+	position_units = ["px","px"] # or ["w%", "h%"]
 	size = [0,0]
-	size_units = "pixels" # or "percentage" (doesn't work yet)
+	size_units = ["px", "px"] # or ["w%", "h%"]
 	auto_size = False
 	background_color = None
 
@@ -37,31 +37,74 @@ class UI_Element:
 			for key in dictionary:
 				setattr(self, key, dictionary[key])
 		self.parent = kwargs.pop('parent')
+
 		for key in kwargs:
 			setattr(self, key, kwargs[key])
+		
+		self.position_initial = self.position
+		self.size_initial = self.size
+		self.change_position(self.position, self.position_units)
+		self.change_size(self.size, self.size_units)
 
-		self.change_position(self.position)
-
-	def change_position(self, new_position):
+	def change_position(self, new_position, units=['px','px']):
 		"""
 		You can figure this one out yourself. If you can't then... *sigh*
 		"""
+		# Apply relative positioning
 		position_zero = [0,0]
 		if self.position_relative:
-			position_zero = [position_zero[i] + self.parent.position[i] for i in [0,1]]
+			percentage_target = self.parent.size
+			position_zero = list(self.parent.position)
+		else:
+			percentage_target = pygdisplay.get_surface().get_size()
+
+		# Apply anchor point
 		if self.position_anchor == 'center':
 			anchor = [0,0]
 		else:
 			anchor = [ANCHORS[self.position_anchor.split(' ')[i]] for i in [1,0]]
+		
+		# Apply percentages
+		for i in [0, 1]:
+			if units[i] == 'w%':
+				new_position[i] = percentage_target[0]*new_position[i]/100
+			elif units[i] == 'h%':
+				new_position[i] = percentage_target[1]*new_position[i]/100
+		
 		self.position = [new_position[i] - (anchor[i]/2+.5)*self.size[i] + position_zero[i] for i in [0,1]]
 		self.rectangle = pygrect.Rect(self.position, self.size)
 
-	def change_size(self, new_size):
+	def change_size(self, new_size, units=['px','px']):
 		"""
 		You can figure this one out yourself. If you can't then... *sigh*
 		"""
+
+		# Apply relative positioning
+		new_position = list(self.position)
+		if self.position_relative:
+			percentage_target = self.parent.size
+			new_position = [self.position[i] - self.parent.position[i] for i in [0,1]]
+		else:
+			percentage_target = pygdisplay.get_surface().get_size()
+
+		# Apply anchor point
+		if self.position_anchor == 'center':
+			anchor = [0,0]
+		else:
+			anchor = [ANCHORS[self.position_anchor.split(' ')[i]] for i in [1,0]]
+		new_position = [new_position[i] + (anchor[i]/2+.5)*self.size[i] for i in [0,1]]
+
+		# Apply percentages 
+		for i in [0, 1]:
+			if units[i] == 'w%':
+				new_size[i] = percentage_target[0]*new_size[i]/100
+			elif units[i] == 'h%':
+				new_size[i] = percentage_target[1]*new_size[i]/100
+		
 		self.size = new_size
-		self.change_position(self.position)
+		
+		# Calculate new position
+		self.change_position(new_position)
 	
 	def draw_bg(self, pygame_window):
 		draw_surface = pygsurface.Surface(pygdisplay.get_surface().get_size()).convert_alpha()
