@@ -10,6 +10,7 @@ import pygame.rect as pygrect
 import pygame.draw as pygdraw
 import pygame.display as pygdisplay
 import pygame.surface as pygsurface
+import pygame._sdl2 as pygsdl2
 
 from pygame_ui.constants import *
 
@@ -31,6 +32,7 @@ class UI_Element:
 	size_units = ["px", "px"] # or ["w%", "h%"]
 	auto_size = False
 	background_color = None
+	use_sdl2 = False
 
 	def __init__(self, initial_data, kwargs):
 		for dictionary in initial_data:
@@ -41,8 +43,8 @@ class UI_Element:
 		for key in kwargs:
 			setattr(self, key, kwargs[key])
 		
-		self.position_initial = self.position
-		self.size_initial = self.size
+		self.position_initial = list(self.position)
+		self.size_initial = list(self.size)
 		self.change_position(self.position, self.position_units)
 		self.change_size(self.size, self.size_units)
 
@@ -50,6 +52,8 @@ class UI_Element:
 		"""
 		You can figure this one out yourself. If you can't then... *sigh*
 		"""
+		new_position = list(new_position)
+
 		# Apply relative positioning
 		position_zero = [0,0]
 		if self.position_relative:
@@ -78,14 +82,12 @@ class UI_Element:
 		"""
 		You can figure this one out yourself. If you can't then... *sigh*
 		"""
-
+		new_size = list(new_size)
+		
 		# Apply relative positioning
 		new_position = list(self.position)
 		if self.position_relative:
-			percentage_target = self.parent.size
 			new_position = [self.position[i] - self.parent.position[i] for i in [0,1]]
-		else:
-			percentage_target = pygdisplay.get_surface().get_size()
 
 		# Apply anchor point
 		if self.position_anchor == 'center':
@@ -95,6 +97,7 @@ class UI_Element:
 		new_position = [new_position[i] + (anchor[i]/2+.5)*self.size[i] for i in [0,1]]
 
 		# Apply percentages 
+		percentage_target = pygdisplay.get_surface().get_size()
 		for i in [0, 1]:
 			if units[i] == 'w%':
 				new_size[i] = percentage_target[0]*new_size[i]/100
@@ -102,25 +105,35 @@ class UI_Element:
 				new_size[i] = percentage_target[1]*new_size[i]/100
 		
 		self.size = new_size
-		
+
 		# Calculate new position
 		self.change_position(new_position)
 	
 	def draw_bg(self, pygame_window):
 		draw_surface = pygsurface.Surface(pygdisplay.get_surface().get_size()).convert_alpha()
 		draw_surface.fill((0,0,0,0))
-
-		if self.auto_size:
-			if isinstance(self, label):
-				auto_rect = pygrect.Rect(self.position, self.font.size(self.text))
-			pygdraw.rect(draw_surface, self.background_color, auto_rect)
-		else:
-			pygdraw.rect(draw_surface, self.background_color, self.rectangle)
+		
+		pygdraw.rect(draw_surface, self.background_color, self.rectangle)
 		
 		if len(self.background_color) < 4:
 			draw_surface.set_alpha(255)
 
 		pygame_window.blit(draw_surface, [0,0])
+	
+	def draw_bg_sdl2(self, renderer):
+		if len(self.background_color) < 4:
+			bg_c = self.background_color + [255]
+		else:
+			bg_c = self.background_color
+
+		# This works but i don't like it, it's not pretty and could probably be faster
+		image = pygsurface.Surface(pygdisplay.get_surface().get_size()).convert_alpha()
+		image.fill(bg_c)
+		image = pygsdl2.Texture.from_surface(renderer, image)
+		renderer.blit(image, self.rectangle)
+		# Something like this below would make more sense, but i couldn't get the alpha channel to work :(
+		#renderer.draw_color = bg_c
+		#renderer.fill_rect(self.rectangle)
 
 
 class frame(UI_Element):
@@ -165,6 +178,13 @@ class frame(UI_Element):
 				if i.background_color != None:
 					i.draw_bg(pygame_window)
 				i.draw(pygame_window)
+	
+	def draw_sdl2(self, renderer):
+		for i in self.elements.values():
+			if i.is_visible:
+				if i.background_color != None:
+					i.draw_bg_sdl2(renderer)
+				i.draw_sdl2(renderer)
 
 
 class label(UI_Element):
@@ -185,6 +205,10 @@ class label(UI_Element):
 	def __init__(self, *initial_data, **kwargs):
 		super().__init__(initial_data, kwargs)
 		self.font = pygfont.SysFont(self.font_name, self.font_size, self.font_bold, self.font_italic)
+		if self.auto_size:
+			if isinstance(self, label):
+				self.change_size(self.font.size(self.text))
+				self.rectangle = pygrect.Rect(self.position, self.size)
 	
 	def change_font(self, **kwargs):
 		"""
@@ -204,6 +228,11 @@ class label(UI_Element):
 	def draw(self, pygame_window):
 		text_surface = self.font.render(self.text, self.text_aa, self.text_color, self.background_color)
 		pygame_window.blit(text_surface, self.position)
+	
+	def draw_sdl2(self, renderer):
+		text_surface = self.font.render(self.text, self.text_aa, self.text_color, self.background_color)
+		texture = pygsdl2.video.Texture.from_surface(renderer, text_surface)
+		renderer.blit(texture, self.rectangle)
 
 
 class text_input(label):
@@ -229,7 +258,14 @@ class text_input(label):
 			text_to_render += '|'
 		text_surface = self.font.render(text_to_render, self.text_aa, self.text_color, self.background_color)
 		pygame_window.blit(text_surface, self.position)
-
+	
+	def draw_sdl2(self, renderer):
+		text_to_render = self.text
+		if self.caret:
+			text_to_render += '|'
+		text_surface = self.font.render(text_to_render, self.text_aa, self.text_color, self.background_color)
+		texture = pygsdl2.video.Texture.from_surface(renderer, text_surface)
+		renderer.blit(texture, self.rectangle)
 
 class button(frame):
 	"""
@@ -273,6 +309,12 @@ class switch(UI_Element):
 			position = [self.position[0]+5+size[0]*int(self.state), self.position[1]+5]
 			pygdraw.rect(pygame_window, (200,200,200), pygrect.Rect(position, size))
 
+	def draw_sdl2(self, renderer):
+		if self.preset == 'simple':
+			size = [self.size[0]/2-5, self.size[1]-10]
+			position = [self.position[0]+5+size[0]*int(self.state), self.position[1]+5]
+			renderer.draw_color = (200,200,200,255)
+			renderer.fill_rect(pygrect.Rect(position, size))
 
 class slider(UI_Element):
 	"""
@@ -307,6 +349,13 @@ class slider(UI_Element):
 			size = [self.size[1]-10, self.size[1]-10]
 			position = [self.position[0]+5+(self.size[0]-self.size[1])*self.value/(self.value_max-self.value_min), self.position[1]+5]
 			pygdraw.rect(pygame_window, (200,200,200), pygrect.Rect(position, size))
+	
+	def draw_sdl2(self, renderer):
+		if self.preset == 'simple':
+			size = [self.size[1]-10, self.size[1]-10]
+			position = [self.position[0]+5+(self.size[0]-self.size[1])*self.value/(self.value_max-self.value_min), self.position[1]+5]
+			renderer.draw_color = (200,200,200,255)
+			renderer.fill_rect(pygrect.Rect(position, size))
 
 
 class dropdown(UI_Element):
