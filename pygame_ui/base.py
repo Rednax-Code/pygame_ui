@@ -24,9 +24,13 @@ class Graphical_UI:
 	old_time = time()
 	new_time = time()
 
-	def __init__(self, objects:dict):
+	def __init__(self, objects:dict, use_sdl2=False, renderer=None):
+		self.use_sdl2 = use_sdl2
 		for name, data in objects.items():
 			element_type = data.pop('type')
+			data['use_sdl2'] = use_sdl2
+			if renderer != None:
+				data['renderer'] = renderer
 			self.elements[name] = getattr(pygame_ui.elements, element_type)(data, parent=None)
 
 	def get_frame(self, frame_path:str=''):
@@ -81,6 +85,27 @@ class Graphical_UI:
 				elif element.is_hoverable or element.is_clickable:
 					interactives.append(element)
 		self.interactive_elements = interactives
+	
+	def video_resize(self, frame=None):
+		"""
+		Makes sure all elements with percentage positions or sizes will get updated to the new window.
+		Usually called on event pygame.VIDEORESIZE.
+		(Doesn't work with moving elements yet)
+		"""
+		if frame == None:
+			target = self
+		else:
+			target = frame
+		for name, element in target.elements.items():
+			element.change_position(element.position_initial, element.position_units)
+			if element.auto_size:
+				if isinstance(element, pygame_ui.label):
+					element.change_size(element.font.size(element.text))
+			else:
+				element.change_size(element.size_initial, element.size_units)
+			if isinstance(element, pygame_ui.frame):
+				self.video_resize(element)
+		return 1
 
 	def event_handler(self, event):
 		"""
@@ -107,7 +132,7 @@ class Graphical_UI:
 		for i in self.interactive_elements:
 			mouse_in_boundry = i.rectangle.collidepoint(mpos)
 
-			# Add exception to hoverable elements to fix hover_exit
+			# Add exception to hoverable elements to fix hover_end
 			exception = False
 			if i.is_hoverable:
 				if i.hover_held:
@@ -193,6 +218,8 @@ class Graphical_UI:
 		Must be called in the following context:
 		>>> Interface.draw(pygame_window)
 		>>> pygame.display.flip()
+
+		Note: when using sdl2 instead of passing pygame_window, pass the renderer.
 		"""
 
 		# Calculate delta-time
@@ -208,11 +235,18 @@ class Graphical_UI:
 					i.caret = not i.caret
 					i.caret_timer = 0
 
-		for i in self.elements.values():
-			if i.is_visible:
-				if i.background_color != None:
-					i.draw_bg(pygame_window)
-				i.draw(pygame_window)
+		if self.use_sdl2:
+			for i in self.elements.values():
+				if i.is_visible:
+					if i.background_color != None:
+						i.draw_bg_sdl2(pygame_window)
+					i.draw_sdl2(pygame_window)
+		else:
+			for i in self.elements.values():
+				if i.is_visible:
+					if i.background_color != None:
+						i.draw_bg(pygame_window)
+					i.draw(pygame_window)
 		
 		# Reset all temporary attribute values
 		for i in self.interactive_elements:
@@ -226,7 +260,7 @@ class Graphical_UI:
 		return 1
 
 
-def init(path_to_json:str='Interface.json'):
+def init(path_to_json:str='Interface.json', use_sdl2=False, renderer=None):
 	"""
 	This loads in the ``Interface.json`` file and created a GUI with it
 	"""
@@ -241,7 +275,7 @@ def init(path_to_json:str='Interface.json'):
 	UI = json.load(file)
 	file.close()
 
-	interface = Graphical_UI(UI)
+	interface = Graphical_UI(UI, use_sdl2, renderer)
 
 	# clearing up namespace
 	del json, os, pygame_ui.elements

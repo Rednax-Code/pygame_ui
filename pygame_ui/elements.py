@@ -8,6 +8,9 @@ import sys
 import pygame.font as pygfont
 import pygame.rect as pygrect
 import pygame.draw as pygdraw
+import pygame.display as pygdisplay
+import pygame.surface as pygsurface
+import pygame._sdl2 as pygsdl2
 
 from pygame_ui.constants import *
 
@@ -24,48 +27,117 @@ class UI_Element:
 	position = [0,0]
 	position_anchor = "top left"
 	position_relative = False
+	position_units = ["px","px"] # or ["w%", "h%"]
 	size = [0,0]
+	size_units = ["px", "px"] # or ["w%", "h%"]
 	auto_size = False
 	background_color = None
+	use_sdl2 = False
 
 	def __init__(self, initial_data, kwargs):
+		renderer = initial_data[0].pop('renderer')
 		for dictionary in initial_data:
 			for key in dictionary:
 				setattr(self, key, dictionary[key])
 		self.parent = kwargs.pop('parent')
+
 		for key in kwargs:
 			setattr(self, key, kwargs[key])
+		
+		self.position_initial = list(self.position)
+		self.size_initial = list(self.size)
+		self.change_position(self.position, self.position_units)
+		self.change_size(self.size, self.size_units)
 
-		self.change_position(self.position)
+		if self.use_sdl2:
+			if self.background_color != None:
+				if len(self.background_color) < 4:
+					bg_c = self.background_color + [255]
+				else:
+					bg_c = self.background_color
+				image = pygsurface.Surface(self.size).convert_alpha()
+				image.fill(bg_c)
+				self.texture = pygsdl2.Texture.from_surface(renderer, image)
 
-	def change_position(self, new_position):
+	def change_position(self, new_position, units=['px','px']):
 		"""
 		You can figure this one out yourself. If you can't then... *sigh*
 		"""
+		new_position = list(new_position)
+
+		# Apply relative positioning
 		position_zero = [0,0]
 		if self.position_relative:
-			position_zero = [position_zero[i] + self.parent.position[i] for i in [0,1]]
+			percentage_target = self.parent.size
+			position_zero = list(self.parent.position)
+		else:
+			percentage_target = pygdisplay.get_surface().get_size()
+
+		# Apply anchor point
 		if self.position_anchor == 'center':
 			anchor = [0,0]
 		else:
 			anchor = [ANCHORS[self.position_anchor.split(' ')[i]] for i in [1,0]]
+		
+		# Apply percentages
+		for i in [0, 1]:
+			if units[i] == 'w%':
+				new_position[i] = percentage_target[0]*new_position[i]/100
+			elif units[i] == 'h%':
+				new_position[i] = percentage_target[1]*new_position[i]/100
+		
 		self.position = [new_position[i] - (anchor[i]/2+.5)*self.size[i] + position_zero[i] for i in [0,1]]
 		self.rectangle = pygrect.Rect(self.position, self.size)
 
-	def change_size(self, new_size):
+	def change_size(self, new_size, units=['px','px']):
 		"""
 		You can figure this one out yourself. If you can't then... *sigh*
 		"""
+		new_size = list(new_size)
+		
+		# Apply relative positioning
+		new_position = list(self.position)
+		if self.position_relative:
+			new_position = [self.position[i] - self.parent.position[i] for i in [0,1]]
+
+		# Apply anchor point
+		if self.position_anchor == 'center':
+			anchor = [0,0]
+		else:
+			anchor = [ANCHORS[self.position_anchor.split(' ')[i]] for i in [1,0]]
+		new_position = [new_position[i] + (anchor[i]/2+.5)*self.size[i] for i in [0,1]]
+
+		# Apply percentages 
+		percentage_target = pygdisplay.get_surface().get_size()
+		for i in [0, 1]:
+			if units[i] == 'w%':
+				new_size[i] = percentage_target[0]*new_size[i]/100
+			elif units[i] == 'h%':
+				new_size[i] = percentage_target[1]*new_size[i]/100
+		
 		self.size = new_size
-		self.change_position(self.position)
+
+		# Calculate new position
+		self.change_position(new_position)
 	
 	def draw_bg(self, pygame_window):
-		if self.auto_size:
-			if isinstance(self, label):
-				auto_rect = pygrect.Rect(self.position, self.font.size(self.text))
-			pygdraw.rect(pygame_window, self.background_color, auto_rect)
-		else:
-			pygdraw.rect(pygame_window, self.background_color, self.rectangle)
+		draw_surface = pygsurface.Surface(pygdisplay.get_surface().get_size()).convert_alpha()
+		draw_surface.fill((0,0,0,0))
+		
+		pygdraw.rect(draw_surface, self.background_color, self.rectangle)
+		
+		if len(self.background_color) < 4:
+			draw_surface.set_alpha(255)
+
+		pygame_window.blit(draw_surface, [0,0])
+	
+	def draw_bg_sdl2(self, renderer):
+		# This works but i don't like it, it's not pretty and could probably be faster
+		renderer.blit(self.texture, self.rectangle)
+		# Something like this below would make more sense, but i couldn't get the alpha channel to work :(
+		#renderer.draw_color = bg_c
+		#renderer.alpha = bg_c[3]
+		#renderer.fill_rect(self.rectangle)
 
 
 class frame(UI_Element):
@@ -79,9 +151,14 @@ class frame(UI_Element):
 
 	def __init__(self, *initial_data, **kwargs):
 		self.elements = {}
+		if initial_data[0]['use_sdl2']:
+			renderer = initial_data[0]['renderer']
 		super().__init__(initial_data, kwargs)
 		for name, data in self.contents.items():
 			element_type = data.pop('type')
+			data['use_sdl2'] = bool(self.use_sdl2)
+			if self.use_sdl2:
+				data['renderer'] = renderer
 			self.elements[name] = globals()[element_type](data, parent=self)
 	
 	def get_text_input_elements(self):
@@ -110,6 +187,13 @@ class frame(UI_Element):
 				if i.background_color != None:
 					i.draw_bg(pygame_window)
 				i.draw(pygame_window)
+	
+	def draw_sdl2(self, renderer):
+		for i in self.elements.values():
+			if i.is_visible:
+				if i.background_color != None:
+					i.draw_bg_sdl2(renderer)
+				i.draw_sdl2(renderer)
 
 
 class label(UI_Element):
@@ -130,6 +214,10 @@ class label(UI_Element):
 	def __init__(self, *initial_data, **kwargs):
 		super().__init__(initial_data, kwargs)
 		self.font = pygfont.SysFont(self.font_name, self.font_size, self.font_bold, self.font_italic)
+		if self.auto_size:
+			if isinstance(self, label):
+				self.change_size(self.font.size(self.text))
+				self.rectangle = pygrect.Rect(self.position, self.size)
 	
 	def change_font(self, **kwargs):
 		"""
@@ -149,6 +237,11 @@ class label(UI_Element):
 	def draw(self, pygame_window):
 		text_surface = self.font.render(self.text, self.text_aa, self.text_color, self.background_color)
 		pygame_window.blit(text_surface, self.position)
+	
+	def draw_sdl2(self, renderer):
+		text_surface = self.font.render(self.text, self.text_aa, self.text_color, self.background_color)
+		texture = pygsdl2.video.Texture.from_surface(renderer, text_surface)
+		renderer.blit(texture, self.rectangle)
 
 
 class text_input(label):
@@ -174,7 +267,14 @@ class text_input(label):
 			text_to_render += '|'
 		text_surface = self.font.render(text_to_render, self.text_aa, self.text_color, self.background_color)
 		pygame_window.blit(text_surface, self.position)
-
+	
+	def draw_sdl2(self, renderer):
+		text_to_render = self.text
+		if self.caret:
+			text_to_render += '|'
+		text_surface = self.font.render(text_to_render, self.text_aa, self.text_color, self.background_color)
+		texture = pygsdl2.video.Texture.from_surface(renderer, text_surface)
+		renderer.blit(texture, self.rectangle)
 
 class button(frame):
 	"""
@@ -218,6 +318,12 @@ class switch(UI_Element):
 			position = [self.position[0]+5+size[0]*int(self.state), self.position[1]+5]
 			pygdraw.rect(pygame_window, (200,200,200), pygrect.Rect(position, size))
 
+	def draw_sdl2(self, renderer):
+		if self.preset == 'simple':
+			size = [self.size[0]/2-5, self.size[1]-10]
+			position = [self.position[0]+5+size[0]*int(self.state), self.position[1]+5]
+			renderer.draw_color = (200,200,200,255)
+			renderer.fill_rect(pygrect.Rect(position, size))
 
 class slider(UI_Element):
 	"""
@@ -252,6 +358,13 @@ class slider(UI_Element):
 			size = [self.size[1]-10, self.size[1]-10]
 			position = [self.position[0]+5+(self.size[0]-self.size[1])*self.value/(self.value_max-self.value_min), self.position[1]+5]
 			pygdraw.rect(pygame_window, (200,200,200), pygrect.Rect(position, size))
+	
+	def draw_sdl2(self, renderer):
+		if self.preset == 'simple':
+			size = [self.size[1]-10, self.size[1]-10]
+			position = [self.position[0]+5+(self.size[0]-self.size[1])*self.value/(self.value_max-self.value_min), self.position[1]+5]
+			renderer.draw_color = (200,200,200,255)
+			renderer.fill_rect(pygrect.Rect(position, size))
 
 
 class dropdown(UI_Element):

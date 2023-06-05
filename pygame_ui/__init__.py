@@ -4,14 +4,14 @@ Pygame UI
 
 A python library for quickly building user interfaces with pygame in a JSON.
 
-Make sure you read the ``Getting started`` section of the documentation at https://pypi.org/project/pygame-json-ui/ or https://github.com/RednaxGaming/pygame_ui.
+Make sure you read the ``Getting started`` section of the documentation at https://pypi.org/project/pygame-json-ui/ or https://github.com/Rednax-Code/pygame_ui.
 """
 
 from pygame_ui.base import *
 from pygame_ui.elements import *
 
 # release, year, month, session
-__version__ = '1.0.0.0'
+__version__ = '1.0.0.2'
 
 print('pygame-json-ui ' + __version__)
 
