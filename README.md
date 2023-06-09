@@ -2,7 +2,7 @@
 # Pygame UI README
 
 [![Licence](https://img.shields.io/badge/license-MIT-informational.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.0.2-informational.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.1.0-informational.svg)]()
 [![Downloads](https://static.pepy.tech/personalized-badge/pygame-json-ui?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=downloads)](https://pepy.tech/project/pygame-json-ui)
 
 [Pygame UI](https://github.com/Rednax-Code/pygame_ui) is a package for building user interfaces for [pygame](https://www.pygame.org/) in JSON.
@@ -55,7 +55,7 @@ You will have two files in the same folder:
 - whatever.py
 - Interface.json <-- Name for automatically loading the file
 
-If you prefer a different name for the json file, or Pygame UI is having issues locating it automatically, you can pass the absolute path to it's parent folder as an argument for `pygame_ui.init()`.
+If you prefer a different name for the json file, or Pygame UI is having issues locating it automatically, you can pass the absolute path to the file as an argument for `pygame_ui.init()`.
 
 Here a simple example for making a label:
 
