@@ -35,7 +35,8 @@ class UI_Element:
 	use_sdl2 = False
 
 	def __init__(self, initial_data, kwargs):
-		renderer = initial_data[0].pop('renderer')
+		if initial_data[0]['use_sdl2']:
+			renderer = initial_data[0].pop('renderer')
 		for dictionary in initial_data:
 			for key in dictionary:
 				setattr(self, key, dictionary[key])
@@ -240,8 +241,9 @@ class label(UI_Element):
 	
 	def draw_sdl2(self, renderer):
 		text_surface = self.font.render(self.text, self.text_aa, self.text_color, self.background_color)
-		texture = pygsdl2.video.Texture.from_surface(renderer, text_surface)
-		renderer.blit(texture, self.rectangle)
+		if not 0 in text_surface.get_size():
+			texture = pygsdl2.video.Texture.from_surface(renderer, text_surface)
+			renderer.blit(texture, text_surface.get_rect().move(self.position))
 
 
 class text_input(label):
@@ -273,8 +275,9 @@ class text_input(label):
 		if self.caret:
 			text_to_render += '|'
 		text_surface = self.font.render(text_to_render, self.text_aa, self.text_color, self.background_color)
-		texture = pygsdl2.video.Texture.from_surface(renderer, text_surface)
-		renderer.blit(texture, self.rectangle)
+		if not 0 in text_surface.get_size():
+			texture = pygsdl2.video.Texture.from_surface(renderer, text_surface)
+			renderer.blit(texture, text_surface.get_rect().move(self.position))
 
 class button(frame):
 	"""
