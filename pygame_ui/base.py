@@ -2,9 +2,21 @@ from pygame_ui.constants import *
 import pygame_ui.elements
 import pygame.locals as pyglocal
 import pygame.mouse as pygmouse
-import pygame.scrap as pygscrap
 import pygame.key as pygkey
+import win32clipboard
 from time import time
+
+def set_clipboard(something):
+	win32clipboard.OpenClipboard()
+	win32clipboard.EmptyClipboard()
+	win32clipboard.SetClipboardText(something)
+	win32clipboard.CloseClipboard()
+
+def get_clipboard():
+	win32clipboard.OpenClipboard()
+	content = win32clipboard.GetClipboardData()
+	win32clipboard.CloseClipboard()
+	return content
 
 
 class Graphical_UI:
@@ -192,12 +204,12 @@ class Graphical_UI:
 					if key in ALPHABET:
 						if event.mod & pyglocal.KMOD_CTRL:
 							if key == 'x':
-								pygscrap.put(pyglocal.SCRAP_TEXT, bytes(i.text, 'utf-8'))
+								set_clipboard(i.text)
 								i.text = ''
 							elif key == 'c':
-								pygscrap.put(pyglocal.SCRAP_TEXT, bytes(i.text, 'utf-8'))
+								set_clipboard(i.text)
 							elif key == 'v':
-								i.text += str(pygscrap.get(pyglocal.SCRAP_TEXT), 'utf-8')
+								i.text += get_clipboard()
 						elif event.mod & pyglocal.KMOD_SHIFT:
 							i.text += key.upper()
 						else:
@@ -279,8 +291,5 @@ def init(path_to_json:str='Interface.json', use_sdl2=False, renderer=None):
 
 	# clearing up namespace
 	del json, os
-
-	# Initialize the pygame module for access to clipboard
-	pygscrap.init()
 
 	return interface

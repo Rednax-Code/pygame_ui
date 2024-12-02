@@ -219,13 +219,18 @@ class label(UI_Element):
 			if isinstance(self, label):
 				self.change_size(self.font.size(self.text))
 				self.rectangle = pygrect.Rect(self.position, self.size)
+		
+	def fix_position(self):
+		if self.auto_size:
+			self.change_size(self.font.size(self.text))
+			self.rectangle = pygrect.Rect(self.position, self.size)
 	
 	def change_font(self, **kwargs):
 		"""
 		Used to change attributes of the font.
 
 		The keyword arguments must exist in the following list:
-		>>> ['font_name', 'font_size', 'font_bold', 'font_bold']
+		>>> ['font_name', 'font_size', 'font_bold', 'font_italic']
 		"""
 
 		for key in kwargs:
