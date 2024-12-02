@@ -278,7 +278,7 @@ def init(path_to_json:str='Interface.json', use_sdl2=False, renderer=None):
 	interface = Graphical_UI(UI, use_sdl2, renderer)
 
 	# clearing up namespace
-	del json, os, pygame_ui.elements
+	del json, os
 
 	# Initialize the pygame module for access to clipboard
 	pygscrap.init()
