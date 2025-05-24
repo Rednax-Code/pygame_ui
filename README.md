@@ -7,7 +7,7 @@
 
 [Pygame UI](https://github.com/Rednax-Code/pygame_ui) is a package for building user interfaces for [pygame](https://www.pygame.org/) in JSON.
 
-It is currently a work in progress, but if you wanna test it out, feel free to do so :)
+It is currently not being worked on. Feel free to pick up this project yourself if you want
 
 ## Table Of Content
 
